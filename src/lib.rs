@@ -2,6 +2,8 @@ use std::error::Error;
 
 use clap::{Parser, ValueEnum};
 
+mod publisher;
+
 type MyResult<T> = Result<T, Box<dyn Error>>;
 
 #[derive(ValueEnum, Debug, Clone)]
@@ -24,5 +26,8 @@ pub fn get_args() -> MyResult<Input> {
 
 pub fn run(input: Input) -> MyResult<()> {
     println!("{:?}", input);
+    match input.entry_types {
+        Publisher::Oreilly => publisher::oreilly::fetch()?,
+    }
     Ok(())
 }
