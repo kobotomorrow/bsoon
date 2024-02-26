@@ -25,9 +25,19 @@ pub fn get_args() -> MyResult<Input> {
 }
 
 pub fn run(input: Input) -> MyResult<()> {
-    println!("{:?}", input);
     match input.entry_types {
-        Publisher::Oreilly => publisher::oreilly::fetch()?,
+        Publisher::Oreilly => {
+            let response = publisher::oreilly::fetch()?;
+            let books = publisher::oreilly::parse(response)?;
+            for book in books {
+                println!("Title: {}", book.title);
+                println!("Author: {}", book.author);
+                println!("Description: {}", book.description);
+                println!("Link: {}", book.link);
+                println!("Release Date: {}", book.release_date);
+                println!();
+            }
+        }
     }
     Ok(())
 }
