@@ -1,15 +1,6 @@
 use std::fs::read_to_string;
 use roxmltree::Document;
-use crate::MyResult;
-
-#[derive(Debug)]
-pub struct Book {
-    pub title: String,
-    pub author: String,
-    pub description: String,
-    pub link: String,
-    pub release_date: String,
-}
+use crate::{Book, MyResult};
 
 pub fn fetch_books() -> MyResult<Vec<Book>> {
     // TODO: API call

@@ -20,6 +20,15 @@ pub struct Input {
     entry_types: Publisher,
 }
 
+#[derive(Debug)]
+struct Book {
+    pub title: String,
+    pub author: String,
+    pub description: String,
+    pub link: String,
+    pub release_date: String,
+}
+
 pub fn get_args() -> MyResult<Input> {
     Ok(Input::parse())
 }
