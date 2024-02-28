@@ -11,15 +11,14 @@ pub struct Book {
     pub release_date: String,
 }
 
-// TODO: Define Interface
-pub fn fetch() -> MyResult<String> {
+pub fn fetch_books() -> MyResult<Vec<Book>> {
     // TODO: API call
     let text = read_to_string("./support/test.xml")?;
-    Ok(text)
+    let books = parse(text)?;
+    Ok(books)
 }
 
-// TODO: Private function
-pub fn parse(xml_text: String) -> MyResult<Vec<Book>> {
+fn parse(xml_text: String) -> MyResult<Vec<Book>> {
     let doc = Document::parse(&xml_text)?;
     let mut titles = vec![];
     let mut authors = vec![];
