@@ -1,4 +1,4 @@
-use std::{error::Error, fs::File};
+use std::{env, error::Error, fs::File};
 
 use clap::{Parser, ValueEnum};
 
@@ -37,15 +37,23 @@ pub fn run(input: Input) -> MyResult<()> {
     create_initial_file()?;
     match input.entry_types {
         Publisher::Oreilly => {
-            let new_books = publisher::oreilly::fetch_books()?;
+            let fetched_books = publisher::oreilly::fetch_books()?;
             let existed_books = csv_to_books()?;
-            let mut books: Vec<Book> = existed_books.clone();
-            for new_book in new_books {
-                if !existed_books.contains(&new_book) {
-                    books.push(new_book);
+            let mut new_books = vec![];
+            for fetched_book in fetched_books {
+                if !existed_books.contains(&fetched_book) {
+                    new_books.push(fetched_book);
                 }
             }
-            write_books(&books)?;
+
+            if new_books.is_empty() {
+                notify("今回は新しい書籍情報はありませんでした".to_string());
+                return Ok(());
+            }
+            notify(format_json_text(&new_books));
+
+            let all_books = [&existed_books[..], &new_books[..]].concat();
+            write_books(&all_books)?;
         }
     }
     Ok(())
@@ -95,4 +103,26 @@ fn csv_to_books() -> MyResult<Vec<Book>> {
         books.push(book);
     }
     Ok(books)
+}
+
+fn notify(text: String) {
+    let url = env::var("BSOON_WEBHOOK_URL").unwrap();
+    let _ = ureq::post(&url).set(
+        "Content-Type", "application/json"
+    ).send_json(ureq::json!({
+        "text": text
+    }));
+}
+
+fn format_json_text(books: &Vec<Book>) -> String {
+    let mut text = String::from("新しい書籍情報が追加されました\n");
+    for book in books {
+        text.push_str(&format!(
+            "タイトル: {}\n著者: {}\nリンク: {}\n\n",
+            book.title,
+            book.author,
+            book.link
+        ));
+    }
+    text
 }

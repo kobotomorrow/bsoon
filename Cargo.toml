@@ -8,5 +8,5 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.0", features = ["derive"] }
 csv = "1"
-ureq = { version = "*" }
+ureq = { version = "*", features = ["json", "charset"] }
 roxmltree = "0.19"
