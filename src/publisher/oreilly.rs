@@ -1,11 +1,11 @@
-use std::fs::read_to_string;
 use roxmltree::Document;
 use crate::{Book, MyResult};
 
 pub fn fetch_books() -> MyResult<Vec<Book>> {
-    // TODO: API call
-    let text = read_to_string("./support/test.xml")?;
-    let books = parse(text)?;
+    let body = ureq::get("https://www.oreilly.co.jp/catalog/soon.xml")
+        .call()?
+        .into_string()?;
+    let books = parse(body)?;
     Ok(books)
 }
 
@@ -15,7 +15,7 @@ fn parse(xml_text: String) -> MyResult<Vec<Book>> {
     let mut authors = vec![];
     let mut descriptions = vec![];
     let mut links = vec![];
-    let mut release_dates = vec![];
+    let mut release_dates = vec![""];
     for node in doc.descendants() {
         if node.has_tag_name("title") {
             titles.push(node.text().unwrap());
@@ -39,9 +39,9 @@ fn parse(xml_text: String) -> MyResult<Vec<Book>> {
         let book = Book {
             title: String::from(titles[i]),
             author: String::from(authors[i]),
-            description: String::from(descriptions[i]),
+            description: descriptions[i].replace("\n", ""),
             link: String::from(links[i]),
-            release_date: String::from(release_dates[i]),
+            release_date: String::from(release_dates[i] ),
         };
         books.push(book);
     }

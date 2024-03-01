@@ -1,4 +1,4 @@
-use std::{error::Error, fs::File, io::Write};
+use std::{error::Error, fs::File};
 
 use clap::{Parser, ValueEnum};
 
